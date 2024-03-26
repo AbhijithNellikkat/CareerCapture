@@ -1,4 +1,4 @@
-import 'package:career_capture/views/add_pdf_view.dart';
+import 'package:career_capture/views/create_new_pdf.dart';
 import 'package:flutter/material.dart';
 
 class HomeView extends StatelessWidget {
@@ -15,13 +15,16 @@ class HomeView extends StatelessWidget {
         ),
         backgroundColor: const Color.fromARGB(255, 112, 1, 1),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => const CreateNewPdfView(),
-          ));
-        },
-        child: const Icon(Icons.add),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.all(18.0),
+        child: FloatingActionButton(
+          onPressed: () {
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) =>  CreateNewPdfView(),
+            ));
+          },
+          child: const Icon(Icons.add),
+        ),
       ),
     );
   }
