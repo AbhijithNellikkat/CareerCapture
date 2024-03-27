@@ -1,4 +1,4 @@
-import 'package:career_capture/views/home_view.dart';
+import 'package:career_capture/views/splash_view.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
-      home: HomeView(),
+      home: const SplashView(),
     );
   }
 }

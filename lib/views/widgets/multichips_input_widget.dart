@@ -39,7 +39,7 @@ class _MultiChipsInputWidgetState extends State<MultiChipsInputWidget> {
           widget.label,
           style: GoogleFonts.poppins(
             fontSize: 15,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
           ),
         ),
         const SizedBox(height: 8),
@@ -52,7 +52,6 @@ class _MultiChipsInputWidgetState extends State<MultiChipsInputWidget> {
             runSpacing: 4.0,
             children: _chips.map((chip) {
               return Chip(
-                
                 backgroundColor: const Color.fromARGB(255, 112, 1, 1),
                 label: Text(
                   chip,
