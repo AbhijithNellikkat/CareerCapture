@@ -50,19 +50,23 @@ class _HomeViewState extends State<HomeView> {
         backgroundColor: const Color.fromARGB(255, 112, 1, 1),
       ),
       body: _buildPdfGridView(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final newPdfPath = await Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => const CreateNewPdfView(),
-          ));
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.all(18.0),
+        child: FloatingActionButton(
+          onPressed: () async {
+            final newPdfPath =
+                await Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => const CreateNewPdfView(),
+            )); 
 
-          if (newPdfPath != null) {
-            setState(() {
-              pdfPaths.add(newPdfPath);
-            });
-          }
-        },
-        child: const Icon(Icons.add),
+            if (newPdfPath != null) {
+              setState(() {
+                pdfPaths.add(newPdfPath);
+              });
+            }
+          },
+          child: const Icon(Icons.add),
+        ),
       ),
     );
   }

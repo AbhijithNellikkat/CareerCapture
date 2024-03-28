@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, use_super_parameters
 
 import 'dart:developer';
 import 'dart:io';
@@ -71,32 +71,50 @@ class _CreateNewPdfViewState extends State<CreateNewPdfView> {
                 child: pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.center,
                   children: <pw.Widget>[
-                    pw.Text('Job Description', textScaleFactor: 2),
+                    pw.Text(
+                      'Job Description',
+                      textScaleFactor: 2,
+                      style: pw.TextStyle(
+                          fontSize: 16, fontWeight: pw.FontWeight.bold),
+                    ),
+                    pw.SizedBox(height: 20),
                   ],
                 ),
               ),
+              pw.SizedBox(height: 40),
               pw.Text('Job Title: ${jobTitleController.text}'),
+              pw.SizedBox(height: 20),
               pw.Text('Company Overview: ${companyOverviewController.text}'),
+              pw.SizedBox(height: 20),
               pw.Text('Role Summary: ${roleSummaryController.text}'),
+              pw.SizedBox(height: 20),
               pw.Text(
                   'Key Responsibilities: ${keyResponsibilitiesController.text}'),
+              pw.SizedBox(height: 20),
               pw.Text(
                   'Required Skills and Qualifications: ${requiredSkills.join(", ")}'),
+              pw.SizedBox(height: 20),
               pw.Text(
                   'Preferred Skills and Qualifications: ${preferredSkills.join(", ")}'),
+              pw.SizedBox(height: 20),
               pw.Text(
                   'Salary Range and Benefits: ${salaryRangeAndBenefitsController.text}'),
+              pw.SizedBox(height: 20),
               pw.Text('Employment Type: $employmentType'),
+              pw.SizedBox(height: 20),
               if (employmentType == 'Internship' ||
                   employmentType == 'Both') ...[
                 pw.Text(
                     'Duration of Internship (Months): ${durationOfInternshipController.text}'),
+                pw.SizedBox(height: 20),
                 pw.Text(
                     'Stipend of Internship: ${stipendOfInternshipController.text}'),
+                pw.SizedBox(height: 20),
               ],
               if (employmentType == 'Full-time' ||
                   employmentType == 'Both') ...[
                 pw.Text('CTC for Full Time: ${ctcForFullTimeController.text}'),
+                pw.SizedBox(height: 20),
               ],
             ];
           },
