@@ -1,12 +1,42 @@
+// ignore_for_file: library_private_types_in_public_api, depend_on_referenced_packages
+
 import 'dart:io';
 
 import 'package:career_capture/views/create_new_pdf.dart';
 import 'package:career_capture/views/pdfPreview_view.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
+
+  @override
+  _HomeViewState createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+  late List<String> pdfPaths;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPdfFiles();
+  }
+
+  void _loadPdfFiles() async {
+    try {
+      final List<String> files = await _listPdfFiles();
+      setState(() {
+        pdfPaths = files;
+      });
+    } catch (e) {
+      debugPrint('Error loading PDF files: $e');
+      setState(() {
+        pdfPaths = [];
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,90 +49,105 @@ class HomeView extends StatelessWidget {
         ),
         backgroundColor: const Color.fromARGB(255, 112, 1, 1),
       ),
-      // body: Padding(
-      //   padding: const EdgeInsets.all(12.0),
-      //   child: GridView.builder(
-      //     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-      //         crossAxisCount: 2),
-      //     itemCount: 5,
-      //     itemBuilder: (context, index) {
-      //       return Padding(
-      //         padding: const EdgeInsets.all(5.0),
-      //         child: Card(
-      //           elevation: 3,
-      //           child: Container(
-      //             width: double.infinity,
-      //             height: 300,
-      //             decoration: const BoxDecoration(
-      //               borderRadius: BorderRadius.all(Radius.circular(10)),
-      //               image: DecorationImage(
-      //                 image: AssetImage('assets/images/pdf_image.png'),
-      //               ),
-      //             ),
-      //           ),
-      //         ),
-      //       );
-      //     },
-      //   ),
-      // ),
-      body: FutureBuilder<List<String>>(
-        future: _listPdfFiles(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else {
-            final pdfPaths = snapshot.data ?? [];
-            return ListView.builder(
-              itemCount: pdfPaths.length,
-              itemBuilder: (context, index) {
-                final pdfPath = pdfPaths[index];
-                return ListTile(
-                  title: Text('Job Description ${index + 1}'),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PdfViewPage(pdfPath: pdfPath),
-                      ),
-                    );
-                  },
-                );
-              },
-            );
+      body: _buildPdfGridView(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final newPdfPath = await Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => const CreateNewPdfView(),
+          ));
+
+          if (newPdfPath != null) {
+            setState(() {
+              pdfPaths.add(newPdfPath);
+            });
           }
         },
-      ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.all(18.0),
-        child: FloatingActionButton(
-          onPressed: () {
-            Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => const CreateNewPdfView(),
-            ));
-          },
-          child: const Icon(Icons.add),
-        ),
+        child: const Icon(Icons.add),
       ),
     );
   }
-}
 
-Future<List<String>> _listPdfFiles() async {
-  try {
-    final Directory directory = await getApplicationDocumentsDirectory();
-    final String path = directory.path;
-    final List<FileSystemEntity> files = directory.listSync();
-    final List<String> pdfPaths = [];
-    for (var file in files) {
-      if (file.path.endsWith('.pdf')) {
-        pdfPaths.add(file.path);
-      }
+  Widget _buildPdfGridView() {
+    if (pdfPaths.isEmpty) {
+      return const Center(child: Text('No PDFs found'));
+    } else {
+      return Padding(
+        padding: const EdgeInsets.all(17.0),
+        child: SingleChildScrollView(
+          child: GridView.builder(
+            shrinkWrap: true,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+            ),
+            itemCount: pdfPaths.length,
+            itemBuilder: (context, index) {
+              final pdfPath = pdfPaths[index];
+              final file = File(pdfPath);
+              final creationDate = file.lastModifiedSync();
+              final formattedDate =
+                  DateFormat('yyyy-MM-dd HH:mm:ss').format(creationDate);
+
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PdfViewPage(pdfPath: pdfPath),
+                    ),
+                  );
+                },
+                child: Card(
+                  elevation: 2,
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 400,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          height: 100,
+                          child: Image.asset(
+                            'assets/images/pdf_image.png',
+                            height: 120,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            'Created: $formattedDate',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      );
     }
-    return pdfPaths;
-  } catch (e) {
-    debugPrint('Error listing PDF files: $e');
-    return [];
+  }
+
+  Future<List<String>> _listPdfFiles() async {
+    try {
+      final Directory directory = await getApplicationDocumentsDirectory();
+      final List<FileSystemEntity> files = directory.listSync();
+      final List<String> pdfPaths = [];
+      for (var file in files) {
+        if (file.path.endsWith('.pdf')) {
+          pdfPaths.add(file.path);
+        }
+      }
+      return pdfPaths;
+    } catch (e) {
+      debugPrint('Error listing PDF files: $e');
+      rethrow;
+    }
   }
 }

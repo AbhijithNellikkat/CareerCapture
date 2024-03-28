@@ -1,8 +1,4 @@
-
-
-
 import 'package:flutter/material.dart';
-
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 
 class PdfViewPage extends StatelessWidget {
@@ -16,8 +12,11 @@ class PdfViewPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('PDF Viewer'),
       ),
-      body: PDFView(
-        filePath: pdfPath,
+      body: Padding(
+        padding: const EdgeInsets.all(18.0),
+        child: PDFView(
+          filePath: pdfPath,
+        ),
       ),
     );
   }

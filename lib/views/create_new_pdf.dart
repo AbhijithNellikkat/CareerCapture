@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:developer';
 import 'dart:io';
 
@@ -34,44 +36,40 @@ class _CreateNewPdfViewState extends State<CreateNewPdfView> {
 
   List<String> requiredSkills = [];
   List<String> preferredSkills = [];
-  List<String> errors = [];
   String employmentType = '';
   late String pdfPath;
 
   final pdf = pw.Document();
 
-   void generatePdf() async {
+  void generatePdf() async {
     final pdfPath = await _createPdfFile();
-    pdfPath != null
-        ? log('PDF generated and saved at: $pdfPath')
-        : log('Failed to generate PDF');
-  }
-
-  Future savePdf() async {
-    Directory documentDirectory = await getApplicationDocumentsDirectory();
-    String documentPath = documentDirectory.path;
-    File file = File("$documentPath/example.pdf");
-    file.writeAsBytesSync(pdf.save() as List<int>);
+    if (pdfPath != null) {
+      log('PDF generated and saved at: $pdfPath');
+      Navigator.pop(context, pdfPath);
+    } else {
+      log('Failed to generate PDF');
+    }
   }
 
   Future<String?> _createPdfFile() async {
     try {
       final Directory directory = await getApplicationDocumentsDirectory();
       final String path = directory.path;
-      final String pdfName = 'job_description_${DateTime.now().millisecondsSinceEpoch}.pdf';
+      final String pdfName =
+          'job_description_${DateTime.now().millisecondsSinceEpoch}.pdf';
       final File file = File('$path/$pdfName');
-      
+
       final pdf = pw.Document();
 
       pdf.addPage(
         pw.MultiPage(
           pageFormat: PdfPageFormat.a4,
-          margin: const pw.EdgeInsets.all(32),
           build: (pw.Context context) {
             return <pw.Widget>[
               pw.Header(
-                level: 0,
+                level: 1,
                 child: pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.center,
                   children: <pw.Widget>[
                     pw.Text('Job Description', textScaleFactor: 2),
                   ],
@@ -80,16 +78,24 @@ class _CreateNewPdfViewState extends State<CreateNewPdfView> {
               pw.Text('Job Title: ${jobTitleController.text}'),
               pw.Text('Company Overview: ${companyOverviewController.text}'),
               pw.Text('Role Summary: ${roleSummaryController.text}'),
-              pw.Text('Key Responsibilities: ${keyResponsibilitiesController.text}'),
-              pw.Text('Required Skills and Qualifications: ${requiredSkills.join(", ")}'),
-              pw.Text('Preferred Skills and Qualifications: ${preferredSkills.join(", ")}'),
-              pw.Text('Salary Range and Benefits: ${salaryRangeAndBenefitsController.text}'),
+              pw.Text(
+                  'Key Responsibilities: ${keyResponsibilitiesController.text}'),
+              pw.Text(
+                  'Required Skills and Qualifications: ${requiredSkills.join(", ")}'),
+              pw.Text(
+                  'Preferred Skills and Qualifications: ${preferredSkills.join(", ")}'),
+              pw.Text(
+                  'Salary Range and Benefits: ${salaryRangeAndBenefitsController.text}'),
               pw.Text('Employment Type: $employmentType'),
-              if (employmentType == 'Internship' || employmentType == 'Both') ...[
-                pw.Text('Duration of Internship (Months): ${durationOfInternshipController.text}'),
-                pw.Text('Stipend of Internship: ${stipendOfInternshipController.text}'),
+              if (employmentType == 'Internship' ||
+                  employmentType == 'Both') ...[
+                pw.Text(
+                    'Duration of Internship (Months): ${durationOfInternshipController.text}'),
+                pw.Text(
+                    'Stipend of Internship: ${stipendOfInternshipController.text}'),
               ],
-              if (employmentType == 'Full-time' || employmentType == 'Both') ...[
+              if (employmentType == 'Full-time' ||
+                  employmentType == 'Both') ...[
                 pw.Text('CTC for Full Time: ${ctcForFullTimeController.text}'),
               ],
             ];
@@ -105,7 +111,6 @@ class _CreateNewPdfViewState extends State<CreateNewPdfView> {
       return null;
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +134,7 @@ class _CreateNewPdfViewState extends State<CreateNewPdfView> {
                   fontSize: 14,
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.all(23.0),
                 child: FormBuilder(
@@ -143,6 +148,7 @@ class _CreateNewPdfViewState extends State<CreateNewPdfView> {
                           validator: FormBuilderValidators.required(
                             errorText: 'Please enter the job title',
                           ),
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
                           decoration: InputDecoration(
                             hintText: 'Enter the job title',
                             hintStyle: GoogleFonts.poppins(
@@ -160,6 +166,7 @@ class _CreateNewPdfViewState extends State<CreateNewPdfView> {
                           validator: FormBuilderValidators.required(
                             errorText: 'Please enter the company overview',
                           ),
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
                           decoration: InputDecoration(
                             hintText: 'Enter the company overview',
                             hintStyle: GoogleFonts.poppins(
@@ -171,6 +178,7 @@ class _CreateNewPdfViewState extends State<CreateNewPdfView> {
                         ),
                         const SizedBox(height: 20),
                         FormBuilderTextField(
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
                           controller: roleSummaryController,
                           validator: FormBuilderValidators.required(
                             errorText: 'Please enter the role summary',
@@ -194,6 +202,7 @@ class _CreateNewPdfViewState extends State<CreateNewPdfView> {
                           ),
                           maxLines: null,
                           name: 'key_responsibilities',
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
                           decoration: InputDecoration(
                             hintText: 'List the key responsibilities',
                             hintStyle: GoogleFonts.poppins(
@@ -230,6 +239,7 @@ class _CreateNewPdfViewState extends State<CreateNewPdfView> {
                             errorText:
                                 'Please enter the salary range and benefits',
                           ),
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
                           name: 'salary_range_and_benefits',
                           decoration: InputDecoration(
                             hintText: 'Salary Range and Benefits',
@@ -260,6 +270,8 @@ class _CreateNewPdfViewState extends State<CreateNewPdfView> {
                                   errorText:
                                       'Please select the employment type',
                                 ),
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
                                 decoration: InputDecoration(
                                   border: const OutlineInputBorder(),
                                   hintText: 'Select Type',
@@ -293,6 +305,8 @@ class _CreateNewPdfViewState extends State<CreateNewPdfView> {
                                   'Please enter the duration of internship',
                             ),
                             name: 'duration_of_internship',
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
                             decoration: InputDecoration(
                               hintText: 'Duration of Internship (Months)',
                               hintStyle: GoogleFonts.poppins(
@@ -306,6 +320,8 @@ class _CreateNewPdfViewState extends State<CreateNewPdfView> {
                         if (employmentType == 'Internship' ||
                             employmentType == 'Both')
                           FormBuilderTextField(
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
                             controller: stipendOfInternshipController,
                             name: 'stipend_of_internship',
                             validator: FormBuilderValidators.required(
@@ -325,6 +341,8 @@ class _CreateNewPdfViewState extends State<CreateNewPdfView> {
                         if (employmentType == 'Full-time' ||
                             employmentType == 'Both')
                           FormBuilderTextField(
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
                             controller: ctcForFullTimeController,
                             name: 'ctc_for_full_time',
                             validator: FormBuilderValidators.required(
@@ -344,18 +362,10 @@ class _CreateNewPdfViewState extends State<CreateNewPdfView> {
                           onTap: () async {
                             if (_formKey.currentState!.saveAndValidate()) {
                               generatePdf();
-
-                             
                             }
                           },
                           child: const SubmitButtonWidget(),
                         ),
-                        const SizedBox(height: 10),
-                        if (errors.isNotEmpty)
-                          Text(
-                            'Please fix the following errors: ${errors.join(", ")}',
-                            style: const TextStyle(color: Colors.red),
-                          ),
                       ],
                     ),
                   ),
